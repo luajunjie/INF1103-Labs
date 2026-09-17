@@ -58,9 +58,7 @@ def main():
             print(f"⚠️ ALERT: Inventory exceeds {limit} units! Overstock detected. Exiting programme and reinitializing back to 0.")
             break
 
-        # Check for limit
-        if inventory >= limit - amount:
-            print(f"⚠️ ALERT: Inventory is about to reach limit! Currently quantity of units left to {limit} units: {limit - inventory} ")   
+  
    
 
 if __name__ == "__main__":
