@@ -6,7 +6,7 @@ def main():
     amount = warning * limit # Visible amount of quantity left to stock limit
     approved_username = ['employee', 'manager', 'boss']
     failed_entries = 0
-    user_auth = input("Enter username for authentication please: ")
+    user_auth = input("Enter username for authentication purposes: ")
 
     # User authentication
     if user_auth in approved_username:
@@ -58,7 +58,10 @@ def main():
             print(f"⚠️ ALERT: Inventory exceeds {limit} units! Overstock detected. Exiting programme and reinitializing back to 0.")
             break
 
-  
+        # Check for limit
+        if inventory >= limit - amount:
+            print(f"⚠️ ALERT: Inventory is about to reach limit! Currently quantity of units left to {limit} units: {limit - inventory} ")   
+
    
 
 if __name__ == "__main__":
