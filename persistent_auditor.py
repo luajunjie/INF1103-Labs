@@ -45,11 +45,12 @@ def calculate_tax(amount):
     return amount * 0.10
 
 
-def generate_report(total_units, failed_attempts, deliveries_processed):
+def generate_report(total_units, failed_attempts, deliveries_processed, history):
     print("\n📊 Final Inventory Report")
     print(f"Total Inventory: {total_units} units")
     print(f"Total Deliveries Processed: {deliveries_processed}")
     print(f"Number of Failed/Rejected Entries: {failed_attempts}")
+    print(f"Transaction History: {history}")
 
 
 def main():
@@ -60,6 +61,7 @@ def main():
     approved_username = ['employee', 'manager', 'boss']
     failed_entries = 0
     deliveries_processed = 0
+    transaction_history = []
 
     # Authentication
     user_auth = input("Enter username for authentication purposes: ")
@@ -79,8 +81,8 @@ def main():
         user_input = get_valid_input()
 
         if user_input == "quit":
-            generate_report(inventory, failed_entries, deliveries_processed)
             print(f"Limit to overstocking: {limit - inventory} units")
+            generate_report(inventory, failed_entries, deliveries_processed, transaction_history)
             break
 
         if user_input is None:
@@ -91,6 +93,7 @@ def main():
         # Process valid delivery
         inventory = process_delivery(inventory, user_input)
         deliveries_processed += 1
+        transaction_history.append(user_input)
         save_inventory(inventory)
         tax = calculate_tax(user_input)
         failed_entries = 0 #Reset after a good entry
