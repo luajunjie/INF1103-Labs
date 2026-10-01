@@ -3,17 +3,24 @@ INVENTORY_FILE = "inventory.txt"
 def load_inventory():
     try:
         with open(INVENTORY_FILE, "r") as f:
-            return int(f.read().strip())
+            lines = f.read().splitlines()
+        total = int(lines[0])
+        if len(lines) > 1 and lines[1].strip():
+            history = [int(x) for x in lines[1].split(",")]
+        else:
+            history = []
+        return total, history
     except FileNotFoundError:
-        return 0  # no file yet: start with empty inventory, no error
-    except ValueError:
+        return 0, []  # no file yet: start empty, no error
+    except (ValueError, IndexError):
         print("⚠️ Inventory file is unreadable. Starting with an empty inventory.")
-        return 0
+        return 0, []
 
 
-def save_inventory(total):
+def save_inventory(total, history):
     with open(INVENTORY_FILE, "w") as f:
-        f.write(str(total))
+        f.write(f"{total}\n")
+        f.write(",".join(str(x) for x in history))
 
 
 def get_valid_input():
@@ -54,14 +61,14 @@ def generate_report(total_units, failed_attempts, deliveries_processed, history)
 
 
 def main():
-    inventory = load_inventory()
+    inventory, transaction_history = load_inventory()
     limit = 5000
     warning = 0.5
     amount = warning * limit
     approved_username = ['employee', 'manager', 'boss']
     failed_entries = 0
     deliveries_processed = 0
-    transaction_history = []
+    
 
     # Authentication
     user_auth = input("Enter username for authentication purposes: ")
@@ -81,8 +88,9 @@ def main():
         user_input = get_valid_input()
 
         if user_input == "quit":
-            print(f"Limit to overstocking: {limit - inventory} units")
+            save_inventory(inventory, transaction_history)
             generate_report(inventory, failed_entries, deliveries_processed, transaction_history)
+            print(f"Limit to overstocking: {limit - inventory} units")
             break
 
         if user_input is None:
@@ -94,7 +102,6 @@ def main():
         inventory = process_delivery(inventory, user_input)
         deliveries_processed += 1
         transaction_history.append(user_input)
-        save_inventory(inventory)
         tax = calculate_tax(user_input)
         failed_entries = 0 #Reset after a good entry
 
@@ -106,7 +113,7 @@ def main():
         if inventory > limit:
             print(f"⚠️ ALERT: Inventory exceeds {limit} units! Overstock detected. Resetting inventory to 0.")
             inventory = 0
-            save_inventory(inventory)
+            save_inventory(inventory, transaction_history)
             break
 
         # Warning when close to limit
