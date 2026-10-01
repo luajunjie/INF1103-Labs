@@ -1,3 +1,21 @@
+INVENTORY_FILE = "inventory.txt"
+
+def load_inventory():
+    try:
+        with open(INVENTORY_FILE, "r") as f:
+            return int(f.read().strip())
+    except FileNotFoundError:
+        return 0  # no file yet: start with empty inventory, no error
+    except ValueError:
+        print("⚠️ Inventory file is unreadable. Starting with an empty inventory.")
+        return 0
+
+
+def save_inventory(total):
+    with open(INVENTORY_FILE, "w") as f:
+        f.write(str(total))
+
+
 def get_valid_input():
     
     user_input = input("Enter stock quantity (or type 'quit' to exit): ")
@@ -35,7 +53,7 @@ def generate_report(total_units, failed_attempts, deliveries_processed):
 
 
 def main():
-    inventory = 0
+    inventory = load_inventory()
     limit = 5000
     warning = 0.5
     amount = warning * limit
@@ -47,6 +65,7 @@ def main():
     user_auth = input("Enter username for authentication purposes: ")
     if user_auth in approved_username:
         print(f"✅ Access successful! Logged in as: {user_auth}")
+        print(f"Loaded inventory: {inventory} units")
     else:
         print("Access unauthorized. Ending programme.")
         exit()
@@ -72,6 +91,7 @@ def main():
         # Process valid delivery
         inventory = process_delivery(inventory, user_input)
         deliveries_processed += 1
+        save_inventory(inventory)
         tax = calculate_tax(user_input)
         failed_entries = 0 #Reset after a good entry
 
@@ -83,6 +103,7 @@ def main():
         if inventory > limit:
             print(f"⚠️ ALERT: Inventory exceeds {limit} units! Overstock detected. Resetting inventory to 0.")
             inventory = 0
+            save_inventory(inventory)
             break
 
         # Warning when close to limit
