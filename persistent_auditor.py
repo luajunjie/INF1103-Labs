@@ -59,6 +59,12 @@ def generate_report(total_units, failed_attempts, deliveries_processed, history)
     print(f"Number of Failed/Rejected Entries: {failed_attempts}")
     print(f"Transaction History: {history}")
 
+def display_inventory(total, history):
+    print("\nCurrent Inventory:")
+    print(f"Total: {total} units")
+    for i, amount in enumerate(history, start=1):
+        print(f"{i}, Delivery, {amount}")
+
 
 def main():
     inventory, transaction_history = load_inventory()
@@ -75,6 +81,7 @@ def main():
     if user_auth in approved_username:
         print(f"✅ Access successful! Logged in as: {user_auth}")
         print(f"Loaded inventory: {inventory} units")
+        display_inventory(inventory, transaction_history)
     else:
         print("Access unauthorized. Ending programme.")
         exit()
@@ -89,6 +96,7 @@ def main():
 
         if user_input == "quit":
             save_inventory(inventory, transaction_history)
+            print("\nInventory successfully saved to inventory.txt")
             generate_report(inventory, failed_entries, deliveries_processed, transaction_history)
             print(f"Limit to overstocking: {limit - inventory} units")
             break
@@ -102,6 +110,7 @@ def main():
         inventory = process_delivery(inventory, user_input)
         deliveries_processed += 1
         transaction_history.append(user_input)
+        print(f"\nNew Delivery Added:\n{len(transaction_history)}, Delivery, {user_input}")
         tax = calculate_tax(user_input)
         failed_entries = 0 #Reset after a good entry
 
