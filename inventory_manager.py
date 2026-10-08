@@ -19,23 +19,32 @@ def load_inventory():
     try:
         with open(INVENTORY_FILE, "r") as f:
             lines = f.read().splitlines()
-        total = int(lines[0])
-        if len(lines) > 1 and lines[1].strip():
-            history = [int(x) for x in lines[1].split(",")]
-        else:
-            history = []
-        return total, history
+        split = lines.index("#history")   # ValueError if missing
+        products = []
+        for line in lines[:split]:
+            name, qty = line.split(",")
+            products.append({"name": name, "quantity": int(qty)})
+        history = []
+        for line in lines[split + 1:]:
+            name, amt = line.split(",")
+            history.append({"product": name, "amount": int(amt)})
+        if len(products) < 3:
+            raise ValueError
+        return products, history
     except FileNotFoundError:
-        return 0, []  # no file yet: start empty, no error
+        return default_products(), []
     except (ValueError, IndexError):
         print("⚠️ Inventory file is unreadable. Starting with an empty inventory.")
-        return 0, []
+        return default_products(), []
 
 
-def save_inventory(total, history):
+def save_inventory(products, history):
     with open(INVENTORY_FILE, "w") as f:
-        f.write(f"{total}\n")
-        f.write(",".join(str(x) for x in history))
+        for p in products:
+            f.write(f"{p['name']},{p['quantity']}\n")
+        f.write("#history\n")
+        for h in history:
+            f.write(f"{h['product']},{h['amount']}\n")
 
 
 def get_valid_input():
