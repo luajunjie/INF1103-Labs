@@ -102,7 +102,7 @@ def update_stock(products, name, amount):
     product = search_product(products, name)
     if product is None:
         return False
-    product["quantity"] = process_delivery(product["quantity"], amount)
+    update_stock(products, product["name"], user_input)
     return True
 
 
@@ -156,6 +156,41 @@ def main():
         exit()
 
     while True:
+        print("\n1. Record delivery  2. Add product  3. Search product  4. Display all")
+        choice = input("Choose an option (or type 'quit' to exit): ").strip().lower()
+
+        if choice == "quit":
+            save_inventory(products, transaction_history)
+            print("\nInventory successfully saved to inventory.txt")
+            generate_report(products, failed_entries, deliveries_processed, transaction_history)
+            print(f"Limit to overstocking: {limit - inventory} units")
+            break
+
+        elif choice == "2":
+            name = input("New product name: ")
+            if add_product(products, name):
+                print(f"✅ {name.strip()} added.")
+            continue
+
+        elif choice == "3":
+            name = input("Product name to search: ")
+            found = search_product(products, name)
+            if found:
+                print(f"🔍 Found: {found['name']} - {found['quantity']} units")
+            else:
+                print("❌ Product not found.")
+            continue
+
+        elif choice == "4":
+            display_all(products)
+            continue
+
+        elif choice != "1":
+            print("❌ Error: Invalid option.")
+            failed_entries += 1
+            print(f"Times of Error: {failed_entries}")
+            continue
+
         # Stop if too many failed attempts
         if failed_entries == 3:
             print("❌ You have entered errors 3 times. Exiting programme.")
