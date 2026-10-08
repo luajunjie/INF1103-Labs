@@ -128,10 +128,7 @@ def generate_report(products, failed_attempts, deliveries_processed, history):
     print(f"Transaction History: {history}")
 
 def display_inventory(products, history):
-    print("\nCurrent Inventory:")
-    for p in products:
-        print(f"{p['name']}: {p['quantity']} units")
-    print(f"Total: {get_total(products)} units")
+    display_all(products)
     for i, h in enumerate(history, start=1):
         print(f"{i}, Delivery, {h['product']}, {h['amount']}")
 
