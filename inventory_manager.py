@@ -79,9 +79,13 @@ def choose_product(products):
         return None
     return products[int(choice) - 1]
 
-def search_product(products, name):
+def search_product(products, name, partial=False):
+    name = name.strip().lower()
+    if name == "":
+        return None
     for p in products:
-        if p["name"].lower() == name.strip().lower():
+        stored = p["name"].strip().lower()
+        if stored == name or (partial and name in stored):
             return p
     return None
 
@@ -174,7 +178,7 @@ def main():
 
         elif choice == "3":
             name = input("Product name to search: ")
-            found = search_product(products, name)
+            found = search_product(products, name, partial=True)
             if found:
                 print(f"🔍 Found: {found['name']} - {found['quantity']} units")
             else:
