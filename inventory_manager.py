@@ -1,4 +1,7 @@
-INVENTORY_FILE = "inventory.txt"
+import json
+import os
+
+INVENTORY_FILE = "inventory.json"
 
 def default_products():
     return [
@@ -16,25 +19,15 @@ def get_total(products):
 
 
 def load_inventory():
+    if not os.path.exists(INVENTORY_FILE):
+        print("No inventory.json found. Starting with an empty inventory.")
+        return default_products(), []
     try:
         with open(INVENTORY_FILE, "r") as f:
-            lines = f.read().splitlines()
-        split = lines.index("#history")   # ValueError if missing
-        products = []
-        for line in lines[:split]:
-            name, qty = line.split(",")
-            products.append({"name": name, "quantity": int(qty)})
-        history = []
-        for line in lines[split + 1:]:
-            name, amt = line.split(",")
-            history.append({"product": name, "amount": int(amt)})
-        if len(products) < 3:
-            raise ValueError
-        return products, history
-    except FileNotFoundError:
-        return default_products(), []
-    except (ValueError, IndexError):
-        print("⚠️ Inventory file is unreadable. Starting with an empty inventory.")
+            data = json.load(f)
+        return data["products"], data["history"]
+    except (json.JSONDecodeError, KeyError):
+        print("⚠️ inventory.json is unreadable. Starting with an empty inventory.")
         return default_products(), []
 
 
