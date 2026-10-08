@@ -32,12 +32,9 @@ def load_inventory():
 
 
 def save_inventory(products, history):
+    data = {"products": products, "history": history}
     with open(INVENTORY_FILE, "w") as f:
-        for p in products:
-            f.write(f"{p['name']},{p['quantity']}\n")
-        f.write("#history\n")
-        for h in history:
-            f.write(f"{h['product']},{h['amount']}\n")
+        json.dump(data, f, indent=4)
 
 def get_valid_input():
     
@@ -140,8 +137,6 @@ def main():
     failed_entries = 0
     deliveries_processed = 0
     
-    
-
     # Authentication
     user_auth = input("Enter username for authentication purposes: ")
     if user_auth in approved_username:
@@ -158,7 +153,7 @@ def main():
 
         if choice == "quit":
             save_inventory(products, transaction_history)
-            print("\nInventory successfully saved to inventory.txt")
+            print("\nInventory successfully saved to inventory.json")
             generate_report(products, failed_entries, deliveries_processed, transaction_history)
             print(f"Limit to overstocking: {limit - inventory} units")
             break
@@ -197,7 +192,7 @@ def main():
 
         if user_input == "quit":
             save_inventory(products, transaction_history)
-            print("\nInventory successfully saved to inventory.txt")
+            print("\nInventory successfully saved to inventory.json")
             generate_report(products, failed_entries, deliveries_processed, transaction_history)
             print(f"Limit to overstocking: {limit - inventory} units")
             break
