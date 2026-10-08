@@ -124,7 +124,7 @@ def generate_report(products, failed_attempts, deliveries_processed, history):
 def display_inventory(products, history):
     display_all(products)
     for i, h in enumerate(history, start=1):
-        print(f"{i}, Delivery, {h['product']}, {h['amount']}")
+            print(f"{i}, Delivery, {h['product']}, {h['amount']}, logged by {h.get('logged_by', 'unknown')}")
 
 
 def main():
@@ -212,8 +212,8 @@ def main():
         product["quantity"] = process_delivery(product["quantity"], user_input)
         deliveries_processed += 1
         inventory = get_total(products)
-        transaction_history.append({"product": product["name"], "amount": user_input})
-        print(f"\nNew Delivery Added:\n{len(transaction_history)}, Delivery, {product['name']}, {user_input}")
+        transaction_history.append({"product": product["name"], "amount": user_input, "logged_by": user_auth})
+        print(f"\nNew Delivery Added:\n{len(transaction_history)}, Delivery, {product['name']}, {user_input}, logged by {user_auth}")
         tax = calculate_tax(user_input)
         failed_entries = 0 #Reset after a good entry
 
