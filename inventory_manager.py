@@ -79,6 +79,39 @@ def choose_product(products):
         return None
     return products[int(choice) - 1]
 
+def search_product(products, name):
+    for p in products:
+        if p["name"].lower() == name.strip().lower():
+            return p
+    return None
+
+
+def add_product(products, name, quantity=0):
+    name = name.strip()
+    if name == "" or "," in name:
+        print("❌ Error: Product name cannot be empty or contain commas.")
+        return False
+    if search_product(products, name) is not None:
+        print(f"❌ Error: {name} already exists.")
+        return False
+    products.append({"name": name, "quantity": quantity})
+    return True
+
+
+def update_stock(products, name, amount):
+    product = search_product(products, name)
+    if product is None:
+        return False
+    product["quantity"] = process_delivery(product["quantity"], amount)
+    return True
+
+
+def display_all(products):
+    print("\n📦 All Products:")
+    for i, p in enumerate(products, start=1):
+        print(f"{i}. {p['name']}: {p['quantity']} units")
+    print(f"Total: {get_total(products)} units")
+
 
 def calculate_tax(amount):
     
