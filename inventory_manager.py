@@ -46,7 +46,6 @@ def save_inventory(products, history):
         for h in history:
             f.write(f"{h['product']},{h['amount']}\n")
 
-
 def get_valid_input():
     
     user_input = input("Enter stock quantity (or type 'quit' to exit): ")
@@ -71,27 +70,42 @@ def process_delivery(current_total, new_value):
     return current_total + new_value
 
 
+def choose_product(products):
+    for i, p in enumerate(products, start=1):
+        print(f"{i}. {p['name']} (in stock: {p['quantity']})")
+    choice = input("Select product number: ")
+    if not choice.isdigit() or not 1 <= int(choice) <= len(products):
+        print("❌ Error: Invalid product number.")
+        return None
+    return products[int(choice) - 1]
+
+
 def calculate_tax(amount):
     
     return amount * 0.10
 
 
-def generate_report(total_units, failed_attempts, deliveries_processed, history):
+def generate_report(products, failed_attempts, deliveries_processed, history):
     print("\n📊 Final Inventory Report")
-    print(f"Total Inventory: {total_units} units")
+    for p in products:
+        print(f"  {p['name']}: {p['quantity']} units")
+    print(f"Total Inventory: {get_total(products)} units")
     print(f"Total Deliveries Processed: {deliveries_processed}")
     print(f"Number of Failed/Rejected Entries: {failed_attempts}")
     print(f"Transaction History: {history}")
 
-def display_inventory(total, history):
+def display_inventory(products, history):
     print("\nCurrent Inventory:")
-    print(f"Total: {total} units")
-    for i, amount in enumerate(history, start=1):
-        print(f"{i}, Delivery, {amount}")
+    for p in products:
+        print(f"{p['name']}: {p['quantity']} units")
+    print(f"Total: {get_total(products)} units")
+    for i, h in enumerate(history, start=1):
+        print(f"{i}, Delivery, {h['product']}, {h['amount']}")
 
 
 def main():
-    inventory, transaction_history = load_inventory()
+    products, transaction_history = load_inventory()
+    inventory = get_total(products)
     limit = 5000
     warning = 0.5
     amount = warning * limit
@@ -99,13 +113,14 @@ def main():
     failed_entries = 0
     deliveries_processed = 0
     
+    
 
     # Authentication
     user_auth = input("Enter username for authentication purposes: ")
     if user_auth in approved_username:
         print(f"✅ Access successful! Logged in as: {user_auth}")
         print(f"Loaded inventory: {inventory} units")
-        display_inventory(inventory, transaction_history)
+        display_inventory(products, transaction_history)
     else:
         print("Access unauthorized. Ending programme.")
         exit()
@@ -119,9 +134,9 @@ def main():
         user_input = get_valid_input()
 
         if user_input == "quit":
-            save_inventory(inventory, transaction_history)
+            save_inventory(products, transaction_history)
             print("\nInventory successfully saved to inventory.txt")
-            generate_report(inventory, failed_entries, deliveries_processed, transaction_history)
+            generate_report(products, failed_entries, deliveries_processed, transaction_history)
             print(f"Limit to overstocking: {limit - inventory} units")
             break
 
@@ -130,11 +145,18 @@ def main():
             print(f"Times of Error: {failed_entries}")
             continue
 
+        product = choose_product(products)
+        if product is None:
+            failed_entries += 1
+            print(f"Times of Error: {failed_entries}")
+            continue
+
         # Process valid delivery
-        inventory = process_delivery(inventory, user_input)
+        product["quantity"] = process_delivery(product["quantity"], user_input)
         deliveries_processed += 1
-        transaction_history.append(user_input)
-        print(f"\nNew Delivery Added:\n{len(transaction_history)}, Delivery, {user_input}")
+        inventory = get_total(products)
+        transaction_history.append({"product": product["name"], "amount": user_input})
+        print(f"\nNew Delivery Added:\n{len(transaction_history)}, Delivery, {product['name']}, {user_input}")
         tax = calculate_tax(user_input)
         failed_entries = 0 #Reset after a good entry
 
@@ -145,8 +167,10 @@ def main():
         # Check for overstock
         if inventory > limit:
             print(f"⚠️ ALERT: Inventory exceeds {limit} units! Overstock detected. Resetting inventory to 0.")
+            for p in products:
+                p["quantity"] = 0
             inventory = 0
-            save_inventory(inventory, transaction_history)
+            save_inventory(products, transaction_history)
             break
 
         # Warning when close to limit
