@@ -106,6 +106,14 @@ def display_all(products):
         print(f"{i}. {p['name']}: {p['quantity']} units")
     print(f"Total: {get_total(products)} units")
 
+def display_history(history):
+    print("\n🧾 Past Deliveries:")
+    if not history:
+        print("No deliveries recorded yet.")
+        return
+    for i, h in enumerate(history, start=1):
+        print(f"{i}. {h['product']} - {h['amount']} units, logged by {h.get('logged_by', 'unknown')}")
+    print(f"Total deliveries on record: {len(history)}")
 
 def calculate_tax(amount):
     
@@ -123,6 +131,7 @@ def generate_report(products, failed_attempts, deliveries_processed, history):
 
 def display_inventory(products, history):
     display_all(products)
+    display_history(history)
     for i, h in enumerate(history, start=1):
             print(f"{i}, Delivery, {h['product']}, {h['amount']}, logged by {h.get('logged_by', 'unknown')}")
 
@@ -148,7 +157,7 @@ def main():
         exit()
 
     while True:
-        print("\n1. Record delivery  2. Add product  3. Search product  4. Display all")
+        print("\n1. Record delivery  2. Add product  3. Search product  4. Display all  5. Delivery History")
         choice = input("Choose an option (or type 'quit' to exit): ").strip().lower()
 
         if choice == "quit":
@@ -176,6 +185,10 @@ def main():
         elif choice == "4":
             display_all(products)
             continue
+
+        elif choice == "5":
+                    display_history(transaction_history)
+                    continue
 
         elif choice != "1":
             print("❌ Error: Invalid option.")
