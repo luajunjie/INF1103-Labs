@@ -109,3 +109,81 @@ def save_and_exit(inventory, failed_entries, deliveries_processed):
     save_inventory(inventory)
     print("\nInventory successfully saved to inventory.json")
     generate_report(inventory, failed_entries, deliveries_processed)
+
+
+def main():
+    inventory = Inventory()
+    load_inventory(inventory)
+
+    user = input("Enter username for authentication purposes: ").strip()
+    if user not in APPROVED_USERS:
+        print("Access unauthorized. Ending programme.")
+        return
+    print(f"✅ Access successful! Logged in as: {user}")
+    inventory.display_all()
+    inventory.display_history()
+
+    failed_entries = 0
+    deliveries_processed = 0
+
+    while True:
+        if failed_entries >= MAX_FAILED:
+            print(f"❌ You have entered errors {MAX_FAILED} times. Exiting programme.")
+            save_and_exit(inventory, failed_entries, deliveries_processed)
+            break
+
+        print("\n1. Display all  2. Add product  3. Update stock (record delivery)"
+              "  4. Search product  5. Delivery history  6. Save  7. Exit")
+        choice = input("Choose an option: ").strip().lower()
+
+        if choice in ("7", "quit", "exit"):
+            save_and_exit(inventory, failed_entries, deliveries_processed)
+            break
+
+        elif choice == "1":
+            inventory.display_all()
+
+        elif choice == "2":
+            if not add_product_menu(inventory):
+                failed_entries += 1
+                print(f"Times of Error: {failed_entries}")
+
+        elif choice == "3":
+            result = update_stock_menu(inventory, user)
+            if result == "ok":
+                deliveries_processed += 1
+                failed_entries = 0  # reset after a good entry
+            elif result == "failed":
+                failed_entries += 1
+                print(f"Times of Error: {failed_entries}")
+            elif result == "quit":
+                save_and_exit(inventory, failed_entries, deliveries_processed)
+                break
+            elif result == "overstock":
+                save_inventory(inventory)
+                break
+
+        elif choice == "4":
+            name = input("Product name to search: ")
+            found = inventory.search_product(name, partial=True)
+            if found:
+                print("🔍 Found:", end=" ")
+                found.display_information()
+            else:
+                print("❌ Product not found.")
+
+        elif choice == "5":
+            inventory.display_history()
+
+        elif choice == "6":
+            save_inventory(inventory)
+            print("💾 Inventory saved to inventory.json")
+
+        else:
+            print("❌ Error: Invalid option.")
+            failed_entries += 1
+            print(f"Times of Error: {failed_entries}")
+
+
+if __name__ == "__main__":
+    main()
