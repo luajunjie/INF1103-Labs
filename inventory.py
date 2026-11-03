@@ -58,3 +58,21 @@ class Inventory:
 
     def get_history(self):
         return list(self.__history)
+    
+        # ---- Display ----
+    def display_all(self):
+        print("\n📦 All Products:")
+        if not self.__products:
+            print("No products yet.")
+        for p in self.__products:
+            p.display_information()
+        print(f"Total: {self.get_total()} units")
+
+    def display_history(self):
+        print("\n🧾 Past Deliveries:")
+        if not self.__history:
+            print("No deliveries recorded yet.")
+            return
+        for i, h in enumerate(self.__history, start=1):
+            print(f"{i}. {h['product']} - {h['amount']} units, logged by {h.get('logged_by', 'unknown')}")
+        print(f"Total deliveries on record: {len(self.__history)}")
