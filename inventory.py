@@ -45,3 +45,16 @@ class Inventory:
     def reset_all_stock(self):
         for p in self.__products:
             p.reset_stock()
+            
+    def record_delivery(self, product, amount, logged_by):
+        """Ask the product to update its own stock, then log the delivery."""
+        if not product.update_stock(amount):
+            return False
+        self.__history.append({"product": product.get_name(), "amount": amount, "logged_by": logged_by})
+        return True
+
+    def add_history_record(self, record):
+        self.__history.append(record)
+
+    def get_history(self):
+        return list(self.__history)
