@@ -1,4 +1,6 @@
-from product import Product
+from physical_product import PhysicalProduct
+from digital_product import DigitalProduct
+from can_be_shipped import CanBeShipped
 from inventory import Inventory
 from file_handler import load_inventory, save_inventory
 
@@ -9,9 +11,7 @@ MAX_FAILED = 3
 APPROVED_USERS = ["employee", "manager", "boss"]
 
 
-# ---------- Input helpers (main program's job: getting user input) ----------
 def get_whole_number(prompt):
-    """Returns an int >= 0, the string 'quit', or None if invalid."""
     text = input(prompt).strip()
     if text.lower() == "quit":
         return "quit"
@@ -21,17 +21,17 @@ def get_whole_number(prompt):
     return int(text)
 
 
-def get_price(prompt):
+def get_positive_number(prompt, label):
     text = input(prompt).strip()
     try:
-        price = float(text)
+        value = float(text)
     except ValueError:
-        print("❌ Error: Please enter a valid price.")
+        print(f"❌ Error: Please enter a valid {label}.")
         return None
-    if price < 0:
-        print("❌ Error: Price cannot be negative.")
+    if value < 0:
+        print(f"❌ Error: {label.capitalize()} cannot be negative.")
         return None
-    return price
+    return value
 
 
 def choose_product(inventory):
@@ -55,10 +55,25 @@ def add_product_menu(inventory):
     if name == "" or "," in name:
         print("❌ Error: Product name cannot be empty or contain commas.")
         return False
-    price = get_price("Price: ")
+    price = get_positive_number("Price: ", "price")
     if price is None:
         return False
-    product = Product(inventory.generate_next_id(), name, price, 0)
+
+    product_type = input("Product type - 1. Physical  2. Digital: ").strip()
+    product_id = inventory.generate_next_id()
+    if product_type == "1":
+        weight = get_positive_number("Weight (kg): ", "weight")
+        if weight is None:
+            return False
+        product = PhysicalProduct(product_id, name, price, 0, weight)
+    elif product_type == "2":
+        size = get_positive_number("Download size (MB): ", "download size")
+        if size is None:
+            return False
+        product = DigitalProduct(product_id, name, price, 0, size)
+    else:
+        print("❌ Error: Please choose 1 or 2.")
+        return False
     if not inventory.add_product(product):
         print(f"❌ Error: {name} already exists.")
         return False
@@ -169,8 +184,13 @@ def main():
             if found:
                 print("🔍 Found:", end=" ")
                 found.display_information()
+                print(f"    Fulfilment: {found.get_fulfilment_info()}")
+                if isinstance(found, CanBeShipped):
+                    print(f"    Shipping cost: ${found.calculate_shipping_cost():.2f}")
             else:
                 print("❌ Product not found.")
+           
+
 
         elif choice == "5":
             inventory.display_history()
