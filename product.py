@@ -1,5 +1,4 @@
 class Product:
-    """Responsibility: represent and manage ONE product."""
 
     def __init__(self, product_id, name, price, stock=0):
         # Double underscore = "private" by convention (name mangling)
@@ -21,7 +20,6 @@ class Product:
         return self.__stock
 
     def update_stock(self, quantity):
-        """Add (or remove, if negative) stock. Refuses to go below 0."""
         if not isinstance(quantity, int):
             return False
         if self.__stock + quantity < 0:
@@ -34,3 +32,11 @@ class Product:
 
     def display_information(self):
         print(f"{self.__product_id} | {self.__name} | ${self.__price:.2f} | {self.__stock} units")
+
+    def to_dict(self):
+        return {
+            "product_id": self.__product_id,
+            "name": self.__name,
+            "price": self.__price,
+            "stock": self.__stock,
+        }     
