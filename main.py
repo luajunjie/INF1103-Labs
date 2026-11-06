@@ -16,7 +16,7 @@ def get_whole_number(prompt):
     if text.lower() == "quit":
         return "quit"
     if not text.isdigit():
-        print("❌ Error: Please enter a whole number of 0 or more.")
+        print(" Error: Please enter a whole number of 0 or more.")
         return None
     return int(text)
 
@@ -26,10 +26,10 @@ def get_positive_number(prompt, label):
     try:
         value = float(text)
     except ValueError:
-        print(f"❌ Error: Please enter a valid {label}.")
+        print(f" Error: Please enter a valid {label}.")
         return None
     if value < 0:
-        print(f"❌ Error: {label.capitalize()} cannot be negative.")
+        print(f" Error: {label.capitalize()} cannot be negative.")
         return None
     return value
 
@@ -40,7 +40,7 @@ def choose_product(inventory):
         print(f"{i}. {p.get_name()} (in stock: {p.get_stock()})")
     choice = input("Select product number: ").strip()
     if not choice.isdigit() or not 1 <= int(choice) <= len(products):
-        print("❌ Error: Invalid product number.")
+        print(" Error: Invalid product number.")
         return None
     return products[int(choice) - 1]
 
@@ -53,7 +53,7 @@ def calculate_tax(amount):
 def add_product_menu(inventory):
     name = input("New product name: ").strip()
     if name == "" or "," in name:
-        print("❌ Error: Product name cannot be empty or contain commas.")
+        print(" Error: Product name cannot be empty or contain commas.")
         return False
     price = get_positive_number("Price: ", "price")
     if price is None:
@@ -72,12 +72,12 @@ def add_product_menu(inventory):
             return False
         product = DigitalProduct(product_id, name, price, 0, size)
     else:
-        print("❌ Error: Please choose 1 or 2.")
+        print(" Error: Please choose 1 or 2.")
         return False
     if not inventory.add_product(product):
-        print(f"❌ Error: {name} already exists.")
+        print(f" Error: {name} already exists.")
         return False
-    print(f"✅ {name} added as {product.get_product_id()}.")
+    print(f" {name} added as {product.get_product_id()}.")
     return True
 
 
@@ -96,22 +96,22 @@ def update_stock_menu(inventory, user):
     inventory.record_delivery(product, amount, user)
     total = inventory.get_total()
     print(f"\nNew Delivery Added: {product.get_name()}, {amount} units, logged by {user}")
-    print(f"✅ Inventory updated. Current total: {total} units")
-    print(f"💰 Tax on this delivery: {calculate_tax(amount):.2f}")
+    print(f" Inventory updated. Current total: {total} units")
+    print(f" Tax on this delivery: {calculate_tax(amount):.2f}")
     print(f"Limit to overstocking: {LIMIT - total} units")
 
     if total > LIMIT:
-        print(f"⚠️ ALERT: Inventory exceeds {LIMIT} units! Overstock detected. Resetting inventory to 0.")
+        print(f" ALERT: Inventory exceeds {LIMIT} units! Overstock detected. Resetting inventory to 0.")
         inventory.reset_all_stock()
         return "overstock"
 
     if total >= LIMIT - WARNING_RATIO * LIMIT:
-        print(f"⚠️ ALERT: Inventory is close to limit! Units left before reaching {LIMIT}: {LIMIT - total}")
+        print(f" ALERT: Inventory is close to limit! Units left before reaching {LIMIT}: {LIMIT - total}")
     return "ok"
 
 
 def generate_report(inventory, failed_entries, deliveries_processed):
-    print("\n📊 Final Inventory Report")
+    print("\n Final Inventory Report")
     for p in inventory.get_products():
         print(f"  {p.get_name()}: {p.get_stock()} units")
     print(f"Total Inventory: {inventory.get_total()} units")
@@ -134,7 +134,7 @@ def main():
     if user not in APPROVED_USERS:
         print("Access unauthorized. Ending programme.")
         return
-    print(f"✅ Access successful! Logged in as: {user}")
+    print(f" Access successful! Logged in as: {user}")
     inventory.display_all()
     inventory.display_history()
 
@@ -143,7 +143,7 @@ def main():
 
     while True:
         if failed_entries >= MAX_FAILED:
-            print(f"❌ You have entered errors {MAX_FAILED} times. Exiting programme.")
+            print(f" You have entered errors {MAX_FAILED} times. Exiting programme.")
             save_and_exit(inventory, failed_entries, deliveries_processed)
             break
 
@@ -182,13 +182,13 @@ def main():
             name = input("Product name to search: ")
             found = inventory.search_product(name, partial=True)
             if found:
-                print("🔍 Found:", end=" ")
+                print(" Found:", end=" ")
                 found.display_information()
                 print(f"    Fulfilment: {found.get_fulfilment_info()}")
                 if isinstance(found, CanBeShipped):
                     print(f"    Shipping cost: ${found.calculate_shipping_cost():.2f}")
             else:
-                print("❌ Product not found.")
+                print(" Product not found.")
            
 
 
@@ -197,10 +197,10 @@ def main():
 
         elif choice == "6":
             save_inventory(inventory)
-            print("💾 Inventory saved to inventory.json")
+            print(" Inventory saved to inventory.json")
 
         else:
-            print("❌ Error: Invalid option.")
+            print(" Error: Invalid option.")
             failed_entries += 1
             print(f"Times of Error: {failed_entries}")
 
