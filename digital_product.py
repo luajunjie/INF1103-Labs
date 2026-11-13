@@ -1,12 +1,14 @@
 from product import Product
+from supplier import Supplier
 
 
 class DigitalProduct(Product):
     TYPE = "digital"
 
-    def __init__(self, product_id, name, price, stock=0, download_size=0.0):
-        super().__init__(product_id, name, price, stock)
-        self.__download_size = float(download_size)
+    def __init__(self, product_id: str, name: str, price: float, stock: int,
+                 supplier: Supplier, download_size: float = 0.0) -> None:
+        super().__init__(product_id, name, price, stock, supplier)  # reuse Product's constructor
+        self.__download_size: float = float(download_size)
 
     def get_download_size(self):
         return self.__download_size

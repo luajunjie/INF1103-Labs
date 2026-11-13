@@ -1,4 +1,5 @@
 from product import Product
+from supplier import Supplier
 from can_be_shipped import CanBeShipped
 
 
@@ -8,9 +9,10 @@ class PhysicalProduct(Product, CanBeShipped):
     BASE_SHIPPING = 5.00   # flat fee per item, in dollars
     RATE_PER_KG = 2.00     # extra charge per kilogram
 
-    def __init__(self, product_id, name, price, stock=0, weight=0.0):
-        super().__init__(product_id, name, price, stock)  # reuse Product's constructor
-        self.__weight = float(weight)
+    def __init__(self, product_id: str, name: str, price: float, stock: int,
+                 supplier: Supplier, weight: float = 0.0) -> None:
+        super().__init__(product_id, name, price, stock, supplier)  # reuse Product's constructor
+        self.__weight: float = float(weight)
 
     def get_weight(self):
         return self.__weight
