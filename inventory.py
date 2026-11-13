@@ -14,7 +14,7 @@ class Inventory:
         self.__products.append(product)
         return True
 
-    def search_product(self, name, partial=False):
+    def search_product(self, name: str, partial: bool = False) -> Product | None:
         name = name.strip().lower()
         if name == "":
             return None
@@ -36,7 +36,7 @@ class Inventory:
                 return p
         return None
 
-    def get_products(self):
+    def get_products(self) -> list[Product]:
         return list(self.__products)  # a copy, so outside code can't change our list
 
     def generate_next_id(self) -> str:
@@ -47,39 +47,39 @@ class Inventory:
                 highest = max(highest, int(digits))
         return f"P{highest + 1:03d}"
 
-    def get_total(self):
+    def get_total(self) -> int:
         total = 0
         for p in self.__products:
             total += p.get_stock()
         return total
 
-    def reset_all_stock(self):
+    def reset_all_stock(self) -> None:
         for p in self.__products:
             p.reset_stock()
-            
-    def record_delivery(self, product, amount, logged_by):
+
+    def record_delivery(self, product: Product, amount: int, logged_by: str) -> bool:         
         if not product.update_stock(amount):
             return False
         self.__history.append({"product": product.get_name(), "amount": amount, "logged_by": logged_by})
         return True
 
-    def add_history_record(self, record):
+    def add_history_record(self, record: dict[str, str | int]) -> None:
         self.__history.append(record)
 
-    def get_history(self):
+    def get_history(self) -> list[dict[str, str | int]]:
         return list(self.__history)
     
         # ---- Display ----
-    def display_all(self):
-        print("\n📦 All Products:")
+    def display_all(self) -> None:
+        print("\n All Products:")
         if not self.__products:
             print("No products yet.")
         for p in self.__products:
             p.display_information()
         print(f"Total: {self.get_total()} units")
 
-    def display_history(self):
-        print("\n🧾 Past Deliveries:")
+    def display_history(self) -> None:
+        print("\n Past Deliveries:")
         if not self.__history:
             print("No deliveries recorded yet.")
             return

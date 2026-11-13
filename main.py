@@ -6,14 +6,14 @@ from inventory import Inventory
 from order import Order
 from file_handler import load_inventory, save_inventory
 
-LIMIT = 5000
-WARNING_RATIO = 0.5
-TAX_RATE = 0.10
-MAX_FAILED = 3
-APPROVED_USERS = ["employee", "manager", "boss"]
+LIMIT: int = 5000
+WARNING_RATIO: float = 0.5
+TAX_RATE: float = 0.10
+MAX_FAILED: int = 3
+APPROVED_USERS: list[str] = ["employee", "manager", "boss"]
 
 
-def get_whole_number(prompt):
+def get_whole_number(prompt: str) -> int | str | None:
     text = input(prompt).strip()
     if text.lower() == "quit":
         return "quit"
@@ -23,7 +23,7 @@ def get_whole_number(prompt):
     return int(text)
 
 
-def get_positive_number(prompt, label):
+def get_positive_number(prompt: str, label: str) -> float | None:
     text = input(prompt).strip()
     try:
         value = float(text)
@@ -36,7 +36,7 @@ def get_positive_number(prompt, label):
     return value
 
 
-def choose_product(inventory):
+def choose_product(inventory: Inventory) -> Product | None:
     products = inventory.get_products()
     for i, p in enumerate(products, start=1):
         print(f"{i}. {p.get_name()} (in stock: {p.get_stock()})")
@@ -56,7 +56,7 @@ def choose_supplier(suppliers: list[Supplier]) -> Supplier | None:
     return suppliers[int(choice) - 1]
 
 
-def calculate_tax(amount):
+def calculate_tax(amount: int) -> float:
     return amount * TAX_RATE
 
 def add_supplier_menu(suppliers: list[Supplier]) -> bool:
@@ -136,7 +136,7 @@ def create_order_menu(inventory: Inventory, orders: list[Order]) -> bool:
     return True
 
 
-def update_stock_menu(inventory, user):
+def update_stock_menu(inventory: Inventory, user: str) -> str:
     product = choose_product(inventory)
     if product is None:
         return "failed"
@@ -164,7 +164,7 @@ def update_stock_menu(inventory, user):
     return "ok"
 
 
-def generate_report(inventory, failed_entries, deliveries_processed):
+def generate_report(inventory: Inventory, failed_entries: int, deliveries_processed: int) -> None:
     print("\n Final Inventory Report")
     for p in inventory.get_products():
         print(f"  {p.get_name()}: {p.get_stock()} units")
