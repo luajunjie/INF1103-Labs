@@ -1,15 +1,15 @@
+from product import Product
+
 class Inventory:
-    """Responsibility: manage a COLLECTION of Product objects (and their delivery records)."""
 
-    def __init__(self):
-        self.__products = []
-        self.__history = []
+    def __init__(self) -> None:
+        self.__products: list[Product] = []
+        self.__history: list[dict[str, str | int]] = []
 
-    def add_product(self, product):
-        """Add a Product object. Rejects duplicate names or IDs."""
+    def add_product(self, product: Product) -> bool:
         if self.search_product(product.get_name()) is not None:
             return False
-        if self.search_by_id(product.get_product_id()) is not None:
+        if self.find_product(product.get_product_id()) is not None:
             return False
         self.__products.append(product)
         return True
@@ -24,7 +24,13 @@ class Inventory:
                 return p
         return None
 
-    def search_by_id(self, product_id):
+    def remove_product(self, product_id: str) -> Product | None:
+        product = self.find_product(product_id)
+        if product is not None:
+            self.__products.remove(product)
+        return product
+
+    def find_product(self, product_id: str) -> Product | None:
         for p in self.__products:
             if p.get_product_id().lower() == product_id.strip().lower():
                 return p
@@ -33,8 +39,13 @@ class Inventory:
     def get_products(self):
         return list(self.__products)  # a copy, so outside code can't change our list
 
-    def generate_next_id(self):
-        return f"P{len(self.__products) + 1:03d}"
+    def generate_next_id(self) -> str:
+        highest = 0
+        for p in self.__products:
+            digits = p.get_product_id()[1:]
+            if digits.isdigit():
+                highest = max(highest, int(digits))
+        return f"P{highest + 1:03d}"
 
     def get_total(self):
         total = 0
@@ -47,7 +58,6 @@ class Inventory:
             p.reset_stock()
             
     def record_delivery(self, product, amount, logged_by):
-        """Ask the product to update its own stock, then log the delivery."""
         if not product.update_stock(amount):
             return False
         self.__history.append({"product": product.get_name(), "amount": amount, "logged_by": logged_by})
