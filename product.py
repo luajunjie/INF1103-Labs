@@ -5,11 +5,19 @@ class Product(ABC):
 
     def __init__(self, product_id: str, name: str, price: float, stock: int,
                  supplier: Supplier) -> None:
+        # Validation: Product owns these rules, so every subclass inherits them (LSP)
+        price = float(price)   # float("abc") raises ValueError on its own
+        stock = int(stock)
+        if price <= 0:
+            raise ValueError("Price must be greater than zero.")
+        if stock < 0:
+            raise ValueError("Stock quantity cannot be negative.")
+
         # Double underscore = "private" by convention (name mangling)
         self.__product_id: str = product_id
         self.__name: str = name
-        self.__price: float = float(price)
-        self.__stock: int = int(stock)
+        self.__price: float = price
+        self.__stock: int = stock
         self.__supplier: Supplier = supplier
 
     def get_product_id(self) -> str:
