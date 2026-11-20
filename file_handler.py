@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 
@@ -91,3 +92,32 @@ def save_inventory(inventory: Inventory, suppliers: list[Supplier],
     }
     with open(filename, "w") as f:
         json.dump(data, f, indent=4)
+
+
+def load_products(path: str, inventory: Inventory, supplier: Supplier) -> None:
+    """Read products from a CSV file, build each one through the ProductFactory,
+    and add it to the inventory. Bad rows are reported and skipped."""
+    try:
+        file = open(path, newline="")
+    except FileNotFoundError:
+        print(f"Products file not found: {path}")
+    else:
+        with file:
+            reader = csv.reader(file)
+            next(reader, None)  # skip the header row
+            loaded = 0
+            for line_number, row in enumerate(reader, start=2):  # line 1 is the header
+                try:
+                    product_type, product_id, name, price, stock_quantity = row
+                    product = ProductFactory.create(product_type, product_id, name,
+                                                    float(price), int(stock_quantity), supplier)
+                except ValueError as error:
+                    print(f"Skipping row {line_number} {row}: {error}")
+                    continue  # one bad row should not stop the rest loading
+                if inventory.add_product(product):
+                    loaded += 1
+                else:
+                    print(f"Skipping row {line_number}: {name} ({product_id}) already exists.")
+        print(f"{loaded} products loaded.")
+    finally:
+        print("Load attempt finished.")
