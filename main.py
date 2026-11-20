@@ -22,6 +22,19 @@ def get_whole_number(prompt: str) -> int | str | None:
     return int(text)
 
 
+def get_positive_float(prompt: str) -> float:
+    """Keep asking until the user enters a number greater than zero."""
+    while True:
+        try:
+            value = float(input(prompt))   # "abc" raises ValueError
+            if value <= 0:                 # validation: our own rule
+                print("Please enter a number greater than zero.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
+
+
 def get_positive_number(prompt: str, label: str) -> float | None:
     text = input(prompt).strip()
     try:
@@ -80,9 +93,7 @@ def add_product_menu(inventory: Inventory, suppliers: list[Supplier]) -> bool:
     if name == "" or "," in name:
         print(" Error: Product name cannot be empty or contain commas.")
         return False
-    price = get_positive_number("Price: ", "price")
-    if price is None:
-        return False
+    price = get_positive_float("Price: ")  # asks again until the price is valid
     
     if supplier is None:
           return False
@@ -125,11 +136,17 @@ def create_order_menu(inventory: Inventory, orders: list[Order]) -> bool:
         product = choose_product(inventory)
         if product is None:
             return False
-        quantity = get_whole_number("Quantity: ")
-        if not isinstance(quantity, int) or quantity == 0:
-            print("Quantity must be a whole number above 0.")
-            return False
-        order.add_order_line(product, quantity)  # the Order creates the OrderLine itself
+        while True:
+            quantity = get_whole_number("Quantity (or 'quit' to cancel the order): ")
+            if quantity == "quit":
+                return False
+            if quantity is None:
+                continue  # error already shown, ask again
+            try:
+                order.add_order_line(product, quantity)  # the OrderLine validates its own quantity
+                break
+            except ValueError as error:
+                print(f" Error: {error}")  # e.g. quantity 0, ask again
         if input("Add another product? (y/n): ").strip().lower() != "y":
             break
     orders.append(order)
