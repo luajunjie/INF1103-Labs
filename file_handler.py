@@ -4,8 +4,7 @@ import os
 from product import Product
 from supplier import Supplier
 from inventory import Inventory
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product_factory import ProductFactory
 
 INVENTORY_FILE = "inventory.json"
 
@@ -21,10 +20,10 @@ def default_products(suppliers: dict[str, Supplier]) -> list[Product]:
     hardware = suppliers["S001"]
     software = suppliers["S002"]
     return [
-        PhysicalProduct("P001", "Laptop", 1200.00, 0, hardware, weight=2.0),
-        PhysicalProduct("P002", "Mouse", 25.50, 0, hardware, weight=0.1),
-        PhysicalProduct("P003", "Keyboard", 45.00, 0, hardware, weight=0.8),
-        DigitalProduct("P004", "Antivirus Software", 59.90, 0, software, download_size=350.0),
+        ProductFactory.create("physical", "P001", "Laptop", 1200.00, 0, hardware, 2.0),
+        ProductFactory.create("physical", "P002", "Mouse", 25.50, 0, hardware, 0.1),
+        ProductFactory.create("physical", "P003", "Keyboard", 45.00, 0, hardware, 0.8),
+        ProductFactory.create("digital", "P004", "Antivirus Software", 59.90, 0, software, 350.0),
     ]
 
 
@@ -44,12 +43,11 @@ def product_from_dict(item: dict[str, str | float], position: int,
     product_type = item.get("type", "physical")  # older files had no type
     # Older files had no supplier, so fall back to the first supplier
     supplier = suppliers.get(item.get("supplier_id", ""), next(iter(suppliers.values())))
+    # The extra detail is saved as "weight" or "download_size" depending on the type
+    extra = item.get("weight", item.get("download_size", 0.0))
 
-    if product_type == "digital":
-        return DigitalProduct(product_id, name, price, stock, supplier, item.get("download_size", 0.0))
-    if product_type == "physical":
-        return PhysicalProduct(product_id, name, price, stock, supplier, item.get("weight", 0.0))
-    raise ValueError(f"Unknown product type: {product_type}")
+    # The factory decides which subclass to build (and rejects unknown types)
+    return ProductFactory.create(product_type, product_id, name, price, stock, supplier, extra)
 
 
 def load_inventory(inventory: Inventory, filename: str = INVENTORY_FILE) -> list[Supplier]:

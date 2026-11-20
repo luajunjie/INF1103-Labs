@@ -1,7 +1,6 @@
 from product import Product
 from supplier import Supplier
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product_factory import ProductFactory
 from inventory import Inventory
 from order import Order
 from file_handler import load_inventory, save_inventory
@@ -88,21 +87,23 @@ def add_product_menu(inventory: Inventory, suppliers: list[Supplier]) -> bool:
     if supplier is None:
           return False
 
-    product_type = input("Product type - 1. Physical  2. Digital: ").strip()
-    product_id = inventory.generate_next_id()
-    if product_type == "1":
-        weight = get_positive_number("Weight (kg): ", "weight")
-        if weight is None:
-            return False
-        product = PhysicalProduct(product_id, name, price, 0, supplier, weight)
-    elif product_type == "2":
-        size = get_positive_number("Download size (MB): ", "download size")
-        if size is None:
-            return False
-        product = DigitalProduct(product_id, name, price, 0, supplier, size)
-    else:
+    choice = input("Product type - 1. Physical  2. Digital: ").strip()
+    # The menu only maps the user's choice to a type name and the extra detail to ask for
+    menu_types = {
+        "1": ("physical", "Weight (kg): ", "weight"),
+        "2": ("digital", "Download size (MB): ", "download size"),
+    }
+    if choice not in menu_types:
         print(" Error: Please choose 1 or 2.")
         return False
+    product_type, extra_prompt, extra_label = menu_types[choice]
+    extra = get_positive_number(extra_prompt, extra_label)
+    if extra is None:
+        return False
+
+    # The factory decides which Product subclass to build
+    product = ProductFactory.create(product_type, inventory.generate_next_id(),
+                                    name, price, 0, supplier, extra)
     if not inventory.add_product(product):
         print(f" Error: {name} already exists.")
         return False
