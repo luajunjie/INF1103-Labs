@@ -34,8 +34,6 @@ def supplier_from_dict(item: dict[str, str]) -> Supplier:
 
 def product_from_dict(item: dict[str, str | float], position: int,
                       suppliers: dict[str, Supplier]) -> Product:
-    """Use the saved "type" to rebuild the right subclass,
-    and the saved "supplier_id" to link it back to its Supplier object."""
     product_id = item.get("product_id", f"P{position:03d}")
     name = item["name"]
     price = item.get("price", 0.0)
@@ -52,7 +50,6 @@ def product_from_dict(item: dict[str, str | float], position: int,
 
 
 def load_inventory(inventory: Inventory, filename: str = INVENTORY_FILE) -> list[Supplier]:
-    """Fill the Inventory with products and history. Returns the list of suppliers."""
     if not os.path.exists(filename):
         print("No inventory.json found. Starting with default products.")
         suppliers = default_suppliers()
@@ -70,7 +67,7 @@ def load_inventory(inventory: Inventory, filename: str = INVENTORY_FILE) -> list
         products = [product_from_dict(item, i, lookup) for i, item in enumerate(data["products"], start=1)]
         history = list(data["history"])
     except (json.JSONDecodeError, KeyError, TypeError, ValueError):
-        print("⚠️ inventory.json is unreadable. Starting with default products.")
+        print("inventory.json is unreadable. Starting with default products.")
         suppliers = default_suppliers()
         products = default_products({s.get_supplier_id(): s for s in suppliers})
         history = []
@@ -84,7 +81,6 @@ def load_inventory(inventory: Inventory, filename: str = INVENTORY_FILE) -> list
 
 def save_inventory(inventory: Inventory, suppliers: list[Supplier],
                    filename: str = INVENTORY_FILE) -> None:
-    """Each supplier and product turns itself into a dictionary."""
     data = {
         "suppliers": [s.to_dict() for s in suppliers],
         "products": [p.to_dict() for p in inventory.get_products()],
@@ -95,8 +91,6 @@ def save_inventory(inventory: Inventory, suppliers: list[Supplier],
 
 
 def load_products(path: str, inventory: Inventory, supplier: Supplier) -> None:
-    """Read products from a CSV file, build each one through the ProductFactory,
-    and add it to the inventory. Bad rows are reported and skipped."""
     try:
         file = open(path, newline="")
     except FileNotFoundError:

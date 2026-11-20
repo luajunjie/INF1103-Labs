@@ -5,8 +5,6 @@ from digital_product import DigitalProduct
 
 
 class ProductFactory:
-    """The one place that decides which Product subclass to build."""
-
     @staticmethod
     def create(product_type: str, product_id: str, name: str, price: float,
                stock_quantity: int, supplier: Supplier, extra: float = 0.0) -> Product:

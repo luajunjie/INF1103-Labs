@@ -10,7 +10,7 @@ def main():
 
     # User authentication
     if user_auth in approved_username:
-        print(f"✅Access successful! Please continue. Currently logged in as:{user_auth}")
+        print(f"Access successful! Please continue. Currently logged in as:{user_auth}")
         
     else:
         print("Access unauthorized. Ending programme.")
@@ -22,7 +22,7 @@ def main():
 
         #Test number of times that user has failed his/her inputs
         if failed_entries == 3:
-                     print("❌ You have entered in error 3 times. Exiting programme.")
+                     print("You have entered in error 3 times. Exiting programme.")
                      break   
 
         # Check if user wants to quit
@@ -33,7 +33,7 @@ def main():
 
         # Validate input: must be digits
         if not user_input.isdigit():
-            print("❌ Error: Please enter a valid integer.")
+            print("Error: Please enter a valid integer.")
             failed_entries +=1
             print(f"Times of Error: {failed_entries} ")
             continue
@@ -43,24 +43,24 @@ def main():
 
         # Reject negative numbers
         if stock < 0:
-            print("❌ Error: Negative values are not allowed.")
+            print("Error: Negative values are not allowed.")
             failed_entries +=1
             print(f"Times of Error: {failed_entries} ")
             continue
 
         # Update inventory
         inventory += stock
-        print(f"✅ Inventory updated. Current total: {inventory} units")
+        print(f"Inventory updated. Current total: {inventory} units")
         print(f"Limit to overstocking:{limit-inventory} units")
 
         # Check for overstock
         if inventory > limit:
-            print(f"⚠️ ALERT: Inventory exceeds {limit} units! Overstock detected. Exiting programme and reinitializing back to 0.")
+            print(f"ALERT: Inventory exceeds {limit} units! Overstock detected. Exiting programme and reinitializing back to 0.")
             break
 
         # Check for limit
         if inventory >= limit - amount:
-            print(f"⚠️ ALERT: Inventory is about to reach limit! Currently quantity of units left to {limit} units: {limit - inventory} ")   
+            print(f"ALERT: Inventory is about to reach limit! Currently quantity of units left to {limit} units: {limit - inventory} ")   
 
    
 

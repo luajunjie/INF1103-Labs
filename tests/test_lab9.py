@@ -1,4 +1,3 @@
-"""Lab 9 automated tests - run with:  python -m pytest"""
 import ast
 import inspect
 from pathlib import Path
@@ -29,7 +28,6 @@ def supplier() -> Supplier:
 
 @pytest.fixture
 def order_of_250(supplier: Supplier) -> Order:
-    """An order whose lines add up to 250 (2 x 100 + 1 x 50)."""
     order = Order("O001")
     order.add_order_line(ProductFactory.create("physical", "P001", "Desk", 100.00, 10, supplier), 2)
     order.add_order_line(ProductFactory.create("digital", "D001", "App", 50.00, 10, supplier), 1)

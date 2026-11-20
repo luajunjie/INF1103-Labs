@@ -23,7 +23,6 @@ def get_whole_number(prompt: str) -> int | str | None:
 
 
 def get_positive_float(prompt: str) -> float:
-    """Keep asking until the user enters a number greater than zero."""
     while True:
         try:
             value = float(input(prompt))   # "abc" raises ValueError
@@ -63,7 +62,7 @@ def choose_supplier(suppliers: list[Supplier]) -> Supplier | None:
         print(f"{i}. {s.get_name()} ({s.get_contact_email()})")
     choice = input("Select supplier number: ").strip()
     if not choice.isdigit() or not 1 <= int(choice) <= len(suppliers):
-        print("❌ Error: Invalid supplier number.")
+        print("Error: Invalid supplier number.")
         return None
     return suppliers[int(choice) - 1]
 
@@ -126,7 +125,7 @@ def remove_product_menu(inventory: Inventory) -> bool:
     if product is None:
         return False
     removed = inventory.remove_product(product.get_product_id())
-    print(f"✅ {removed.get_name()} removed from the inventory.")
+    print(f"{removed.get_name()} removed from the inventory.")
     return True
 
 

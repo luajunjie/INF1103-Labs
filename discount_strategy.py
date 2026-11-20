@@ -45,8 +45,6 @@ class BulkDiscount(DiscountStrategy):
 
 
 class StudentDiscount(DiscountStrategy):
-    """Added in Section 2.4 - a new option is a new class, Order does not change."""
-
     RATE: float = 5.0  # percent off for students
 
     def apply(self, total: float) -> float:

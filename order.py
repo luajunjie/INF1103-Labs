@@ -39,7 +39,7 @@ class Order:
         return self.__discount.apply(total)  # no if/elif: the strategy decides
 
     def display_information(self) -> None:
-        print(f"\n🧾 Order {self.__order_id}")
+        print(f"\nOrder {self.__order_id}")
         if not self.__order_lines:
             print("  (no items)")
         for line in self.__order_lines:
